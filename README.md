@@ -1,123 +1,87 @@
 # Global Booking System
 
 ## Project Overview
-A production‑ready backend service for a global live‑learning platform. It manages **courses**, **offerings (sections)**, **sessions**, **parents**, and **bookings**. Teachers create offerings in their timezone; students/parents view schedules in their local timezone. The system handles concurrency, time‑zone conversion, and provides a dynamic frontend dashboard.
+A production‑ready backend service for a global live‑learning platform. It manages **courses**, **offerings (sections)**, **sessions**, **parents**, and **bookings**. Teachers create offerings in their own timezone; parents/students view schedules in their local timezone.
 
 ## Tech Stack
 - **Java 21**
-- **Spring Boot 3.3** (Spring Web, Spring Data JPA, Spring Validation)
+- **Spring Boot 3.3** (Web, Data JPA, Validation)
 - **MySQL 8** (JDBC with `allowPublicKeyRetrieval=true`)
-- **Maven** for build management
-- **HTML/CSS/JavaScript** (static UI in `src/main/resources/static/`)
-- **IntelliJ IDEA** (recommended IDE)
+- **Maven** (or the Maven wrapper `./mvnw`)
+- **Postman** collection for API testing
 
 ## Setup Instructions
-1. **Clone the repository** (or work in the existing scratch directory `D:\UndoSchool Assessment\global-booking-system`).
-2. **Configure JDK** – ensure Java 21 is installed and `JAVA_HOME` points to it.
-3. **Create a MySQL database** named `booking_system` and a user with appropriate privileges.
-4. Update `src/main/resources/application.properties` with your DB credentials.
-5. Build the project:
+1. **Clone / initialise** the repo and `cd` into the project root.
+2. **Create MySQL database** `booking_system` and run the supplied `schema.sql` (and optional `data.sql`).
+3. Add your DB credentials to `src/main/resources/application.properties`.
+4. Build & run:
    ```bash
-   mvn clean package
-   ```
-6. Run the application:
-   ```bash
+   ./mvnw clean package
    java -jar target/booking-0.0.1-SNAPSHOT.jar
    ```
-   The service will start on **http://localhost:8080**.
+5. The API will be available at `http://localhost:8080/api`.
 
-## Environment Variables Required
-| Variable | Description | Example                                                                                |
-|---|---|----------------------------------------------------------------------------------------|
-| `SPRING_DATASOURCE_URL` | JDBC URL for MySQL (must include `allowPublicKeyRetrieval=true`) | `jdbc:mysql://localhost:3306/booking_system?useSSL=false&allowPublicKeyRetrieval=true` |
-| `SPRING_DATASOURCE_USERNAME` | DB username | `YOUR_USERNAME`                                                                        |
-| `SPRING_DATASOURCE_PASSWORD` | DB password | `your_password`                                                                        |
-| `SERVER_PORT` *(optional)* | Port for the embedded Tomcat | `8080`                                                                                 |
+## Environment Variables (application.properties)
+```
+spring.datasource.url=jdbc:mysql://localhost:3306/booking_db?useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.username=YOUR_DB_USER
+spring.datasource.password=YOUR_DB_PASSWORD
+spring.jpa.hibernate.ddl-auto=none
+```
 
 ## API Documentation
-### Base URL
-`http://localhost:8080/api`
+All endpoints are under the `/api` base path.
 
-| Endpoint | Method | Description | Request Body | Response |
-|---|---|---|---|---|
-| `/courses` | GET | List all courses | – | `[{id, name, description}]` |
-| `/courses` | POST | Create a new course | `{name, description}` | Created course object |
-| `/offerings` | GET | List all offerings (with sessions) | – | `[{id, courseId, name, timezone, sessions[]}]` |
-| `/offerings` | POST | Create an offering | `{courseId, name, timezone, sessions[]}` | Created offering |
-| `/parents` | GET | List all parents (used by UI) | – | `[{id, name, email}]` |
-| `/bookings` | POST | Book a student into a session | `{parentId, offeringId, sessionId}` | Booking confirmation or error |
-| `/bookings/{id}` | DELETE | Cancel a booking | – | Success/Failure message |
+### Parent (Student) Endpoints (`/api/parents`)
+| Method | URL | Description | Request Body |
+|---|---|---|---|
+| `GET` | `/api/parents` | Get all parents (used by UI) | – |
+| `GET` | `/api/parents/offerings` | List all available offerings (optionally convert times with `?timezone=ZoneId`) | – |
+| `POST` | `/api/parents/bookings` | Book a parent into an offering | `{"parentId":Long,"offeringId":Long}` |
+| `GET` | `/api/parents/{parentId}/bookings` | Get bookings for a specific parent (optional `timezone` query) | – |
 
-All dates/times are stored in **UTC** and converted to the caller’s local timezone based on the `timezone` field supplied when creating an offering.
+### Teacher (Creator) Endpoints (`/api/teachers`)
+| Method | URL | Description | Request Body |
+|---|---|---|---|
+| `POST` | `/api/teachers/offerings` | Create a new offering for a course | `CreateOfferingRequest` (courseId, teacherId, name, timezone, maxCapacity) |
+| `POST` | `/api/teachers/offerings/{offeringId}/sessions` | Add one or more sessions to an existing offering | List of `SessionTimeRequest` (startTime, endTime) |
+| `GET` | `/api/teachers/{teacherId}/offerings` | Get all offerings created by a specific teacher (optional `timezone`) | – |
+
+> **Note**: All date‑time strings are ISO‑8601 and are interpreted in the offering’s timezone, then stored as UTC.
 
 ## Database Schema Overview
 ```sql
-CREATE TABLE course (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT
-);
-
-CREATE TABLE offering (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id BIGINT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    timezone VARCHAR(50) NOT NULL,
-    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES course(id)
-);
-
-CREATE TABLE session (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    offering_id BIGINT NOT NULL,
-    start_time TIMESTAMP NOT NULL,   -- stored as UTC
-    end_time TIMESTAMP NOT NULL,
-    capacity INT NOT NULL,
-    CONSTRAINT fk_offering FOREIGN KEY (offering_id) REFERENCES offering(id)
-);
-
-CREATE TABLE parent (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL
-);
-
-CREATE TABLE booking (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    parent_id BIGINT NOT NULL,
-    session_id BIGINT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_parent FOREIGN KEY (parent_id) REFERENCES parent(id),
-    CONSTRAINT fk_session FOREIGN KEY (session_id) REFERENCES session(id),
-    UNIQUE (parent_id, session_id) -- prevent duplicate bookings
-);
+-- see src/main/resources/schema.sql for full definitions
+CREATE TABLE course ( id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT );
+CREATE TABLE offering ( id BIGINT AUTO_INCREMENT PRIMARY KEY, course_id BIGINT NOT NULL, teacher_id BIGINT, name VARCHAR(255) NOT NULL, timezone VARCHAR(64) NOT NULL, max_capacity INT NOT NULL, FOREIGN KEY (course_id) REFERENCES course(id) );
+CREATE TABLE session ( id BIGINT AUTO_INCREMENT PRIMARY KEY, offering_id BIGINT NOT NULL, start_time TIMESTAMP NOT NULL, end_time TIMESTAMP NOT NULL, capacity INT NOT NULL, FOREIGN KEY (offering_id) REFERENCES offering(id) );
+CREATE TABLE parent ( id BIGINT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) UNIQUE NOT NULL );
+CREATE TABLE booking ( id BIGINT AUTO_INCREMENT PRIMARY KEY, parent_id BIGINT NOT NULL, session_id BIGINT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (parent_id) REFERENCES parent(id), FOREIGN KEY (session_id) REFERENCES session(id), UNIQUE (parent_id, session_id) );
 ```
 
-## Assumptions Made
-- Teachers create offerings in their native timezone; the `timezone` column on `offering` captures this.
-- All timestamps are persisted as UTC (`Instant` in Java) to avoid daylight‑saving issues.
-- Capacity limits are enforced per session; over‑booking is prevented via pessimistic write locks.
-- Parents are the primary users interacting with the UI; authentication/authorization is out of scope.
-- Simple static seed data (`schema.sql` / `data.sql`) is sufficient for demo purposes.
+## Assumptions
+- Teachers provide their timezone when creating an offering; all times are stored in UTC.
+- Offerings have a fixed `maxCapacity`; bookings beyond that are rejected.
+- Simple parent authentication is out of scope.
 
-## Concurrency Handling Approach
-- **Pessimistic write locking** (`SELECT ... FOR UPDATE`) on `session` rows during booking to avoid race conditions.
-- Service methods are annotated with `@Transactional` to ensure atomicity.
-- Unique constraint on `(parent_id, session_id)` prevents duplicate bookings.
-- Spring Data JPA repositories expose custom methods like `findByIdForUpdate(Long id)`.
+## Concurrency Handling
+- **Pessimistic write locks** (`SELECT … FOR UPDATE`) on `session` rows during a booking transaction to avoid over‑booking.
+- Service methods are annotated with `@Transactional` for atomicity.
 
-## Timezone Handling Approach
-- Offerings store a `timezone` string (e.g., `Asia/Kolkata`).
-- When creating a session, the input local time is parsed with that `ZoneId` and converted to UTC (`Instant`) for persistence.
-- API responses include both UTC timestamps and optional local‑formatted strings for convenience.
-- Frontend fetches the `timezone` and performs client‑side formatting when displaying schedules.
+## Timezone Handling
+- Incoming times are parsed with the offering’s `timezone` and converted to `Instant` (UTC) for persistence.
+- Responses include a `full` flag (`currentBookingsCount >= maxCapacity`).
+- UI can request times in any timezone via the optional `timezone` query parameter.
 
-## Steps to Run the Application Locally
-1. **Start MySQL** and create the `booking_system` database.
-2. **Apply schema** – the `schema.sql` file is executed automatically on startup (Spring `spring.datasource.initialize=true`).
-3. **Load seed data** – `data.sql` provides sample courses, offerings, sessions, and parents.
-4. **Build & run** (see Setup Instructions).
-5. Open a browser at `http://localhost:8080/` to view the dynamic dashboard.
-6. Use tools like **Postman** or **curl** to interact with the REST API endpoints listed above.
+## Running Locally
+```bash
+# 1. Start MySQL and create the DB
+# 2. Apply schema.sql
+# 3. Set DB credentials in application.properties
+# 4. Build & run the app
+./mvnw spring-boot:run
+```
+Open `http://localhost:8080` (static UI) or use the Postman collection (`postman_collection.json`).
 
 ---
-
+*Feel free to adjust wording or add more details as your project evolves.*

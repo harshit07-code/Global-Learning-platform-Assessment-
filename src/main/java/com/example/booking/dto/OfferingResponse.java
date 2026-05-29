@@ -4,29 +4,28 @@ import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
 
-
-//  When parents or teachers fetch available batches, they get this object.
-
+/**
+ * DTO returned when parents or teachers fetch available batches.
+ * Includes a boolean flag indicating whether the offering is fully booked.
+ */
 @Getter
 @Setter
 public class OfferingResponse {
 
-    private Long id; //  ID of the offering batch
-    
+    private Long id;                     // ID of the offering batch
     private Long courseId;
     private String courseTitle;
     private String courseDescription;
 
     private Long teacherId;
-    private String name; // Name of the batch, e.g., "Weekday Summer Camp"
-    private String timezone; // The teacher's timezone in which it was created (e.g. "Asia/Kolkata")
-    
+    private String name;                  // e.g., "Weekday Summer Camp"
+    private String timezone;              // Teacher's timezone (e.g., "Asia/Kolkata")
+
     private int maxCapacity;
     private int currentBookingsCount;
 
-    private List<SessionResponse> sessions; // List of all classes (sessions) in this batch
+    /** Indicates if the offering has reached its capacity. */
+    private boolean full;                 // <-- added
 
-    public void setFull(boolean b) {
-
-    }
+    private List<SessionResponse> sessions; // Sessions in this batch
 }

@@ -6,8 +6,6 @@ import lombok.Setter;
 
 /**
  * DTO for booking a class offering batch.
- * 
- * Student explanation:
  * When a parent wants to book a class, they send this request body in JSON.
  * It contains the ID of the parent who is booking and the ID of the offering they want to book.
  */

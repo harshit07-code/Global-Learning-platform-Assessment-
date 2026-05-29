@@ -26,10 +26,10 @@ public class Session {
     private Offering offering; // The parent offering batch this session belongs to
 
     @Column(name = "teacher_id", nullable = false)
-    private Long teacherId; // The ID of the teacher conducting the class
+    private Long teacherId;
 
     @Column(name = "start_time", nullable = false)
-    private Instant startTime; // Date and time when the class starts (stored in UTC)
+    private Instant startTime;
 
     @Column(name = "end_time", nullable = false)
     private Instant endTime; // Date and time when the class ends (stored in UTC)

@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * DTO representing the session time details input by a teacher.
- * 
- * Student explanation:
  * When adding sessions, the teacher inputs times in their local timezone.
  * For example: "2026-06-06T18:00:00" (which means 6:00 PM on June 6).
  * We accept these as strings and parse them into LocalDateTime.

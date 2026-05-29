@@ -12,13 +12,6 @@ import java.util.Map;
 
 /**
  * Global Exception Handler to catch any exceptions thrown in controllers or services
- * and format them into nice, readable JSON error responses.
- * 
- * Student explanation:
- * Think of this class as a safety net!
- * Instead of letting the application crash or show a scary Java Stack Trace,
- * this class catches the errors, reads the error message, and sends back a clean message
- * with a proper HTTP Status code (like 400 Bad Request or 404 Not Found).
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {

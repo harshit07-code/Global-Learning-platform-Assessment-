@@ -20,16 +20,11 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
     /**
      * Finds all sessions that have already been booked by a parent.
-     * 
-     * Student explanation:
      * This query is super important for our Time Conflict checks.
      * We join the Session, its Offering, and the Parent's Booking together.
      * It basically says: "Give me all class times (sessions) for all the courses (offerings)
      * that this parent has successfully booked."
      * We will use this list to make sure no new classes overlap with these times.
-     *
-     * @param parentId the parent's ID
-     * @return list of sessions already booked by the parent
      */
     @Query("SELECT s FROM Session s " +
            "JOIN s.offering o " +

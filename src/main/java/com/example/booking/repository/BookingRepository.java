@@ -11,10 +11,6 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    /**
-     * Find all booking records for a specific parent.
-     * Maps to SQL: "SELECT * FROM bookings WHERE parent_id = ?"
-     */
     List<Booking> findByParentId(Long parentId);
 
     /**

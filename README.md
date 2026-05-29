@@ -12,7 +12,7 @@ A production‑ready backend service for a global live‑learning platform. It m
 - **IntelliJ IDEA** (recommended IDE)
 
 ## Setup Instructions
-1. **Clone the repository** (or work in the existing scratch directory `C:\Users\HP\.gemini\antigravity\scratch\global-booking-system`).
+1. **Clone the repository** (or work in the existing scratch directory `D:\UndoSchool Assessment\global-booking-system`).
 2. **Configure JDK** – ensure Java 21 is installed and `JAVA_HOME` points to it.
 3. **Create a MySQL database** named `booking_system` and a user with appropriate privileges.
 4. Update `src/main/resources/application.properties` with your DB credentials.
@@ -27,12 +27,12 @@ A production‑ready backend service for a global live‑learning platform. It m
    The service will start on **http://localhost:8080**.
 
 ## Environment Variables Required
-| Variable | Description | Example |
-|---|---|---|
-| `SPRING_DATASOURCE_URL` | JDBC URL for MySQL (must include `allowPublicKeyRetrieval=true`) | `jdbc:mysql://localhost:3306/booking_db?useSSL=false&allowPublicKeyRetrieval=true` |
-| `SPRING_DATASOURCE_USERNAME` | DB username | `booking_user` |
-| `SPRING_DATASOURCE_PASSWORD` | DB password | `your_password` |
-| `SERVER_PORT` *(optional)* | Port for the embedded Tomcat | `8080` |
+| Variable | Description | Example                                                                                |
+|---|---|----------------------------------------------------------------------------------------|
+| `SPRING_DATASOURCE_URL` | JDBC URL for MySQL (must include `allowPublicKeyRetrieval=true`) | `jdbc:mysql://localhost:3306/booking_system?useSSL=false&allowPublicKeyRetrieval=true` |
+| `SPRING_DATASOURCE_USERNAME` | DB username | `YOUR_USERNAME`                                                                        |
+| `SPRING_DATASOURCE_PASSWORD` | DB password | `your_password`                                                                        |
+| `SERVER_PORT` *(optional)* | Port for the embedded Tomcat | `8080`                                                                                 |
 
 ## API Documentation
 ### Base URL

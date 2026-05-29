@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service class that contains business logic for bookings, concurrency, and conflict checking.
- * 
- * Student explanation:
+
  * This is the most critical class of the project! It implements all our core Booking Rules.
  * When a parent tries to book a course batch:
  * 1. We lock the Parent and Offering rows in the database (Pessimistic Locking).
@@ -104,7 +102,7 @@ public class BookingService {
         for (Session newSession : newSessionsToBook) {
             for (Session existingSession : existingBookedSessions) {
                 if (isOverlapping(newSession, existingSession)) {
-                    // Formulate a helpful student-friendly error message showing where the conflict is in parent's timezone
+
                     String newSessionFormatted = formatInstant(newSession.getStartTime(), parent.getTimezone()) + 
                             " to " + formatInstant(newSession.getEndTime(), parent.getTimezone());
                     String existingSessionFormatted = formatInstant(existingSession.getStartTime(), parent.getTimezone()) + 
@@ -117,11 +115,11 @@ public class BookingService {
             }
         }
 
-        // 6. All rules passed! Let's update the offering's booking count
+        // 6. All rules passed! now we can update the offering's booking count
         offering.setCurrentBookingsCount(offering.getCurrentBookingsCount() + 1);
         offeringRepository.save(offering);
 
-        // 7. Insert the booking record
+        // 7. Insert  booking record now
         Booking booking = new Booking();
         booking.setParent(parent);
         booking.setOffering(offering);
@@ -138,14 +136,14 @@ public class BookingService {
      */
     @Transactional(readOnly = true)
     public List<BookingResponse> getBookingsByParent(Long parentId, String targetTimezone) {
-        // 1. Verify parent exists
+        //  parent exists
         Parent parent = parentRepository.findById(parentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found with ID: " + parentId));
 
         // 2. Fetch all bookings for this parent
         List<Booking> bookings = bookingRepository.findByParentId(parentId);
 
-        // 3. Convert bookings to responses.
+
         // If targetTimezone is specified, use it. Otherwise, use parent's default timezone!
         String tz = (targetTimezone != null) ? targetTimezone : parent.getTimezone();
         
@@ -162,19 +160,10 @@ public class BookingService {
         return parentRepository.findAll();
     }
 
-    // ==========================================
-    // Helper Methods
-    // ==========================================
+
 
     /**
      * Checks if two class sessions overlap in time.
-     * 
-     * Student explanation of overlap math:
-     * Imagine session 1 is 5:00 PM to 6:00 PM. Session 2 is 5:30 PM to 6:30 PM.
-     * Do they overlap? Yes!
-     * Mathematically, they overlap if:
-     * - Session 1 starts BEFORE Session 2 ends (5:00 PM < 6:30 PM) AND
-     * - Session 1 ends AFTER Session 2 starts (6:00 PM > 5:30 PM)
      */
     private boolean isOverlapping(Session s1, Session s2) {
         return s1.getStartTime().isBefore(s2.getEndTime()) && s1.getEndTime().isAfter(s2.getStartTime());

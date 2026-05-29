@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Live-Learning Platform — Booking Dashboard</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Style */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--accent-success);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--accent-success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glassmorphic Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #e5e7eb;
+        }
+
+        /* Forms styling */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control, select {
+            width: 100%;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:hover {
+            opacity: 0.95;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-success) 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Dynamic lists */
+        .item-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .list-item {
+            background: rgba(10, 15, 30, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .list-item:hover {
+            background: rgba(10, 15, 30, 0.6);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .list-title {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        .badge-info {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-capacity {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-full {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .session-info {
+            background: rgba(10, 15, 30, 0.8);
+            border-left: 3px solid var(--primary);
+            border-radius: 0.35rem;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            color: #d1d5db;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Toast system */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: rgba(22, 28, 45, 0.95);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid var(--primary);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            min-width: 320px;
+            max-width: 450px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success { border-left-color: var(--accent-success); }
+        .toast.danger { border-left-color: var(--accent-danger); }
+        .toast.warning { border-left-color: var(--accent-warning); }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* Utilities */
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1024px) {
+            .col-span-2 {
+                grid-column: span 1;
+            }
+        }
+
+        .timezone-filter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(10, 15, 30, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+        }
+
+        .timezone-filter label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>Global Booking System Dashboard</h1>
+            <p>Teacher scheduling & parent bookings timezone coordinator</p>
+        </div>
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            Server Connection Live
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        
+        <!-- SECTION 1: Create Offering (Teacher) -->
+        <div class="card">
+            <h2>🏫 Teacher: Create Offering</h2>
+            <form id="createOfferingForm">
+                <div class="form-group">
+                    <label for="offeringCourseId">Select Course</label>
+                    <select id="offeringCourseId" required>
+                        <option value="1">Java Backend course(ID: 1)</option>
+                        <option value="2">Spring and SpringBoot (ID: 2)</option>
+                        <option value="3">Public Speaking and Confidence (ID: 3)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="offeringTeacherId">Teacher ID</label>
+                        <input type="number" id="offeringTeacherId" class="form-control" placeholder="e.g. 101" required value="101">
+                    </div>
+                    <div class="form-group">
+                        <label for="offeringName">Batch Name</label>
+                        <input type="text" id="offeringName" class="form-control" placeholder="e.g. Saturday Batch" required value="Saturday Batch">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="offeringTimezone">Teacher's Timezone</label>
+                        <select id="offeringTimezone" required>
+                            <option value="Asia/Kolkata">Asia/Kolkata (IST - UTC+5:30)</option>
+                            <option value="America/New_York">America/New_York (EST/EDT - UTC-5/-4)</option>
+                            <option value="Europe/London">Europe/London (GMT/BST - UTC+0/+1)</option>
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="offeringCapacity">Max capacity</label>
+                        <input type="number" id="offeringCapacity" class="form-control" min="1" max="100" required value="10">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Create Class Offering</button>
+            </form>
+        </div>
+
+        <!-- SECTION 2: Add Sessions to Offering (Teacher) -->
+        <div class="card">
+            <h2>📅 Teacher: Add Sessions</h2>
+            <form id="addSessionsForm">
+                <div class="form-group">
+                    <label for="sessionOfferingId">Select Offering (Batch)</label>
+                    <select id="sessionOfferingId" required>
+                        <option value="">-- Click refresh to load offerings --</option>
+                    </select>
+                </div>
+                
+                <div style="border: 1px dashed var(--border-color); padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.25rem;">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">
+                        SESSION DETAIL (In Teacher's Timezone)
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sessionStart">Start date & time</label>
+                            <input type="datetime-local" id="sessionStart" class="form-control" required value="2026-06-06T18:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionEnd">End date & time</label>
+                            <input type="datetime-local" id="sessionEnd" class="form-control" required value="2026-06-06T19:00">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">Inject Session Time</button>
+            </form>
+        </div>
+
+        <!-- SECTION 3: Book Offering (Parent) -->
+        <div class="card">
+            <h2>🛒 Parent: Book Offering</h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="bookingParentId">Select Parent (Profile)</label>
+                    <select id="bookingParentId" required>
+                        <option value="">-- Loading parents... --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bookingOfferingId">Select Offering to Book</label>
+                    <select id="bookingOfferingId" required>
+                        <option value="">-- Click refresh to load offerings --</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Confirm Booking (All Sessions)</button>
+            </form>
+        </div>
+
+        <!-- SECTION 4: View Bookings (Parent) -->
+        <div class="card">
+            <h2>🔍 Parent: View Booked Offerings</h2>
+            <div class="form-row" style="align-items: flex-end;">
+                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                    <label for="viewBookingsParentId">Select Parent</label>
+                    <select id="viewBookingsParentId" required>
+                        <option value="">-- Loading parents... --</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <button id="btnFetchBookings" class="btn" style="box-shadow: none;">Show Bookings</button>
+                </div>
+            </div>
+            
+            <div id="bookingsListContainer" style="margin-top: 1.5rem; max-height: 280px; overflow-y: auto;">
+                <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem;">
+                    No bookings loaded. Select a parent and click Show Bookings.
+                </p>
+            </div>
+        </div>
+
+        <!-- SECTION 5: Available Offerings List (Unified) -->
+        <div class="card col-span-2">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>🌍 Current Class Offerings & Schedules</h2>
+                <button id="btnRefreshOfferings" class="btn" style="width: auto; padding: 0.5rem 1rem; box-shadow: none; font-size: 0.85rem;">
+                    🔄 Refresh Offerings
+                </button>
+            </div>
+
+            <!-- Timezone selector to view available offerings in different timezones -->
+            <div class="timezone-filter">
+                <label for="viewTimezone">Convert all session schedules to timezone:</label>
+                <select id="viewTimezone" style="max-width: 300px;">
+                    <option value="">-- Native Timezones --</option>
+                    <option value="America/New_York">America/New_York (Alice's TZ)</option>
+                    <option value="Europe/London">Europe/London (Bob's TZ)</option>
+                    <option value="Asia/Kolkata">Asia/Kolkata (Charlie's TZ)</option>
+                    <option value="UTC">UTC (Coordinated Universal Time)</option>
+                </select>
+            </div>
+
+            <div id="offeringsList" style="max-height: 500px; overflow-y: auto; padding-right: 0.5rem;">
+                <!-- Dynamically loaded offerings list -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    // Constants
+    const API_BASE = '/api';
+
+    // Elements
+    const toastContainer = document.getElementById('toastContainer');
+    const createOfferingForm = document.getElementById('createOfferingForm');
+    const addSessionsForm = document.getElementById('addSessionsForm');
+    const bookingForm = document.getElementById('bookingForm');
+    const btnFetchBookings = document.getElementById('btnFetchBookings');
+    const btnRefreshOfferings = document.getElementById('btnRefreshOfferings');
+    const viewTimezone = document.getElementById('viewTimezone');
+    const sessionOfferingId = document.getElementById('sessionOfferingId');
+    const bookingOfferingId = document.getElementById('bookingOfferingId');
+    const offeringsList = document.getElementById('offeringsList');
+    const bookingsListContainer = document.getElementById('bookingsListContainer');
+    const bookingParentId = document.getElementById('bookingParentId');
+    const viewBookingsParentId = document.getElementById('viewBookingsParentId');
+
+    // Show Notification Toast
+    function showNotification(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const text = document.createElement('span');
+        text.innerText = message;
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'toast-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.onclick = () => toast.remove();
+        
+        toast.appendChild(text);
+        toast.appendChild(closeBtn);
+        toastContainer.appendChild(toast);
+        
+        // Remove after 6 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 6000);
+    }
+
+    // Load registered parents dynamically from the database
+    async function loadParents() {
+        try {
+            const response = await fetch(`${API_BASE}/parents`);
+            if (!response.ok) throw new Error("Could not retrieve parents");
+            const parents = await response.json();
+            
+            bookingParentId.innerHTML = '';
+            viewBookingsParentId.innerHTML = '';
+            
+            parents.forEach(parent => {
+                const optText = `${parent.name} (${parent.timezone})`;
+                
+                const opt1 = document.createElement('option');
+                opt1.value = parent.id;
+                opt1.innerText = optText;
+                bookingParentId.appendChild(opt1);
+                
+                const opt2 = document.createElement('option');
+                opt2.value = parent.id;
+                opt2.innerText = optText;
+                viewBookingsParentId.appendChild(opt2);
+            });
+        } catch (error) {
+            console.error(error);
+            showNotification('danger', 'Failed to fetch parents list: ' + error.message);
+        }
+    }
+
+    // Load available offerings into displays
+    async function loadOfferings() {
+        try {
+            const selectedTz = viewTimezone.value;
+            let url = `${API_BASE}/parents/offerings`;
+            if (selectedTz) {
+                url += `?timezone=${encodeURIComponent(selectedTz)}`;
+            }
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Could not retrieve offerings");
+            const offerings = await response.json();
+            
+            // 1. Populate Dropdowns
+            // Clear current options
+            sessionOfferingId.innerHTML = '<option value="">-- Select Offering --</option>';
+            bookingOfferingId.innerHTML = '<option value="">-- Select Offering --</option>';
+            
+            offerings.forEach(offering => {
+                const optText = `[ID: ${offering.id}] ${offering.courseTitle} - ${offering.name} (${offering.timezone})`;
+                
+                const opt1 = document.createElement('option');
+                opt1.value = offering.id;
+                opt1.innerText = optText;
+                sessionOfferingId.appendChild(opt1);
+                
+                const opt2 = document.createElement('option');
+                opt2.value = offering.id;
+                opt2.innerText = `${optText} (${offering.currentBookingsCount}/${offering.maxCapacity} Booked)`;
+                bookingOfferingId.appendChild(opt2);
+            });
+
+            // 2. Populate Offering List Cards
+            offeringsList.innerHTML = '';
+            if (offerings.length === 0) {
+                offeringsList.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No offerings in the system yet. Teachers need to create one above.</p>`;
+                return;
+            }
+
+            offerings.forEach(off => {
+                const isFull = off.currentBookingsCount >= off.maxCapacity;
+                const badgeClass = isFull ? 'badge-full' : 'badge-capacity';
+                const badgeText = isFull ? 'FULL' : `${off.currentBookingsCount}/${off.maxCapacity} BOOKED`;
+
+                const cardHtml = `
+                    <div class="list-item">
+                        <div class="list-header">
+                            <div>
+                                <span class="list-title">${off.courseTitle}</span>
+                                <span class="info-label" style="display: block; font-size: 0.8rem; margin-top: 0.1rem;">Course ID: ${off.courseId} | Offering ID: ${off.id} | Teacher ID: ${off.teacherId}</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <span class="badge badge-info">${off.name}</span>
+                                <span class="badge ${badgeClass}">${badgeText}</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">${off.courseDescription}</p>
+                        
+                        <div style="margin-top: 0.5rem;">
+                            <span class="info-label" style="font-weight: 600;">Scheduled Class Sessions:</span>
+                            ${off.sessions.length === 0 ? 
+                                '<p style="font-size: 0.85rem; color: var(--accent-warning); font-style: italic; margin-top: 0.25rem;">No sessions scheduled yet for this batch.</p>' : 
+                                off.sessions.map(sess => `
+                                    <div class="session-info">
+                                        <span>📅 ${sess.startTimeLocal} to ${sess.endTimeLocal.split(' ')[1]}</span>
+                                        <span class="info-label" style="margin: 0; font-size: 0.75rem;">Timezone: ${sess.timezoneUsed}</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+                offeringsList.innerHTML += cardHtml;
+            });
+            
+        } catch (error) {
+            console.error(error);
+            showNotification('danger', 'Failed to fetch offerings list: ' + error.message);
+        }
+    }
+
+    // Create Offering Submission
+    createOfferingForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            courseId: parseInt(document.getElementById('offeringCourseId').value),
+            teacherId: parseInt(document.getElementById('offeringTeacherId').value),
+            name: document.getElementById('offeringName').value,
+            timezone: document.getElementById('offeringTimezone').value,
+            maxCapacity: parseInt(document.getElementById('offeringCapacity').value)
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/teachers/offerings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to create offering');
+            }
+
+            showNotification('success', `Offering batch '${data.name}' created successfully with ID: ${data.id}!`);
+            loadOfferings();
+        } catch (err) {
+            showNotification('danger', err.message);
+        }
+    };
+
+    // Add Session Submission
+    addSessionsForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const offeringId = sessionOfferingId.value;
+        if (!offeringId) {
+            showNotification('warning', 'Please select an offering batch first.');
+            return;
+        }
+
+        const payload = [
+            {
+                startTime: document.getElementById('sessionStart').value + ':00',
+                endTime: document.getElementById('sessionEnd').value + ':00'
+            }
+        ];
+
+        try {
+            const response = await fetch(`${API_BASE}/teachers/offerings/${offeringId}/sessions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to inject sessions');
+            }
+
+            showNotification('success', 'Session scheduled and converted to UTC database successfully!');
+            loadOfferings();
+        } catch (err) {
+            showNotification('danger', err.message);
+        }
+    };
+
+    // Book Offering Submission
+    bookingForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            parentId: parseInt(document.getElementById('bookingParentId').value),
+            offeringId: parseInt(bookingOfferingId.value)
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/parents/bookings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Booking rejected');
+            }
+
+            showNotification('success', `Success! Parent ${data.parentName} booked all sessions for offering batch: '${data.offering.name}'!`);
+            loadOfferings();
+            
+            // Auto update bookings list if current parent is selected
+            if (document.getElementById('viewBookingsParentId').value == payload.parentId) {
+                fetchBookings();
+            }
+        } catch (err) {
+            // Trigger beautiful failure red toast
+            showNotification('danger', err.message);
+        }
+    };
+
+    // Fetch Bookings for Parent
+    async function fetchBookings() {
+        const parentId = document.getElementById('viewBookingsParentId').value;
+        try {
+            const response = await fetch(`${API_BASE}/parents/${parentId}/bookings`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to retrieve bookings');
+            }
+
+            bookingsListContainer.innerHTML = '';
+            if (data.length === 0) {
+                bookingsListContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; padding: 1rem;">No booked batches for this parent.</p>`;
+                return;
+            }
+
+            data.forEach(booking => {
+                const off = booking.offering;
+                const sessionsHtml = off.sessions.map(sess => `
+                    <div class="session-info" style="border-left-color: var(--accent-success);">
+                        <span>📅 ${sess.startTimeLocal} to ${sess.endTimeLocal.split(' ')[1]}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${sess.timezoneUsed}</span>
+                    </div>
+                `).join('');
+
+                const itemHtml = `
+                    <div style="background: rgba(10, 15, 30, 0.6); padding: 1rem; border-radius: 0.75rem; margin-bottom: 0.75rem; border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 700; color: #fff;">${off.courseTitle}</span>
+                            <span class="badge badge-info" style="font-size: 0.7rem;">${off.name}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                            Booking ID: ${booking.bookingId} | Booked at: ${new Date(booking.bookedAt).toLocaleString()}
+                        </div>
+                        ${sessionsHtml}
+                    </div>
+                `;
+                bookingsListContainer.innerHTML += itemHtml;
+            });
+        } catch (err) {
+            showNotification('danger', err.message);
+        }
+    }
+
+    // Event Listeners
+    btnFetchBookings.onclick = fetchBookings;
+    btnRefreshOfferings.onclick = loadOfferings;
+    viewTimezone.onchange = loadOfferings;
+
+    // Initial Load
+    window.onload = () => {
+        loadParents();
+        loadOfferings();
+    };
+</script>
+
+</body>
+</html>

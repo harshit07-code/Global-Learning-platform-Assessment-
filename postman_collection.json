@@ -2,7 +2,7 @@
   "info": {
     "name": "Global Booking System API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Postman collection for the Global Booking System backend REST API.",
+    "description": "Postman collection for the Global Booking System backend REST API. All endpoints correspond to the actual Spring controllers in the project.",
     "_postman_id": "b9f6c8e6-4a93-4d6d-9c7a-2f3e1b8c7d9a",
     "version": {
       "major": "1",
@@ -12,82 +12,68 @@
   },
   "item": [
     {
-      "name": "Courses",
+      "name": "Parent APIs",
       "item": [
         {
-          "name": "List Courses",
+          "name": "List Available Offerings",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/courses",
+              "raw": "{{baseUrl}}/parents/offerings",
               "host": ["{{baseUrl}}"],
-              "path": ["courses"]
-            }
+              "path": ["parents", "offerings"]
+            },
+            "description": "Retrieve all offerings that are currently available for booking. Optional `timezone` query param can be supplied to get times converted to a specific zone."
           },
           "response": []
         },
         {
-          "name": "Create Course",
+          "name": "Book Offering",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Sample Course\",\n  \"description\": \"A description for the sample course.\"\n}"
+              "raw": "{\n  \"parentId\": 1,\n  \"offeringId\": 2,\n  \"sessionId\": 5\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/courses",
+              "raw": "{{baseUrl}}/parents/bookings",
               "host": ["{{baseUrl}}"],
-              "path": ["courses"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Offerings",
-      "item": [
-        {
-          "name": "List Offerings",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/offerings",
-              "host": ["{{baseUrl}}"],
-              "path": ["offerings"]
-            }
+              "path": ["parents", "bookings"]
+            },
+            "description": "Create a booking for a parent. `parentId`, `offeringId` and `sessionId` are required."
           },
           "response": []
         },
         {
-          "name": "Create Offering",
+          "name": "Get Parent Bookings",
           "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"courseId\": 1,\n  \"teacherId\": 1,\n  \"name\": \"Weekday Summer Camp\",\n  \"timezone\": \"Asia/Kolkata\",\n  \"maxCapacity\": 30,\n  \"sessions\": [\n    {\n      \"startTime\": \"2024-07-01T10:00:00\",\n      \"endTime\": \"2024-07-01T11:00:00\",\n      \"capacity\": 30\n    }\n  ]\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/offerings",
+              "raw": "{{baseUrl}}/parents/{{parentId}}/bookings",
               "host": ["{{baseUrl}}"],
-              "path": ["offerings"]
-            }
+              "path": ["parents", "{{parentId}}", "bookings"],
+              "variable": [
+                {
+                  "key": "parentId",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "List all bookings belonging to a specific parent. Optional `timezone` query param can be supplied."
           },
           "response": []
-        }
-      ]
-    },
-    {
-      "name": "Parents",
-      "item": [
+        },
         {
-          "name": "List Parents",
+          "name": "List All Parents",
           "request": {
             "method": "GET",
             "header": [],
@@ -95,42 +81,87 @@
               "raw": "{{baseUrl}}/parents",
               "host": ["{{baseUrl}}"],
               "path": ["parents"]
-            }
+            },
+            "description": "Retrieve the list of all parent entities (used by the UI for selection)."
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Bookings",
+      "name": "Teacher APIs",
       "item": [
         {
-          "name": "Create Booking",
+          "name": "Create Offering",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"parentId\": 1,\n  \"sessionId\": 1\n}\n"
+              "raw": "{\n  \"courseId\": 1,\n  \"teacherId\": 101,\n  \"name\": \"Saturday Batch\",\n  \"timezone\": \"Asia/Kolkata\",\n  \"maxCapacity\": 15\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/bookings",
+              "raw": "{{baseUrl}}/teachers/offerings",
               "host": ["{{baseUrl}}"],
-              "path": ["bookings"]
-            }
+              "path": ["teachers", "offerings"]
+            },
+            "description": "Create a new offering (batch) for a teacher."
           },
           "response": []
         },
         {
-          "name": "Cancel Booking",
+          "name": "Add Sessions to Offering",
           "request": {
-            "method": "DELETE",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"startTime\": \"2026-06-06T18:00:00\",\n    \"endTime\": \"2026-06-06T19:00:00\"\n  },\n  {\n    \"startTime\": \"2026-06-13T18:00:00\",\n    \"endTime\": \"2026-06-13T19:00:00\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/offerings/{{offeringId}}/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "offerings", "{{offeringId}}", "sessions"],
+              "variable": [
+                {
+                  "key": "offeringId",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Add one or more sessions to an existing offering."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Teacher Offerings",
+          "request": {
+            "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/bookings/{{bookingId}}",
+              "raw": "{{baseUrl}}/teachers/{{teacherId}}/offerings",
               "host": ["{{baseUrl}}"],
-              "path": ["bookings", "{{bookingId}}"]
-            }
+              "path": ["teachers", "{{teacherId}}", "offerings"],
+              "variable": [
+                {
+                  "key": "teacherId",
+                  "value": "101",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Retrieve all offerings that belong to a specific teacher. Optional `timezone` query param can be supplied."
           },
           "response": []
         }

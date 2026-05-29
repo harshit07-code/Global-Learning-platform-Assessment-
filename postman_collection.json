@@ -1,0 +1,147 @@
+{
+  "info": {
+    "name": "Global Booking System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for the Global Booking System backend REST API.",
+    "_postman_id": "b9f6c8e6-4a93-4d6d-9c7a-2f3e1b8c7d9a",
+    "version": {
+      "major": "1",
+      "minor": "0",
+      "patch": "0"
+    }
+  },
+  "item": [
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample Course\",\n  \"description\": \"A description for the sample course.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Offerings",
+      "item": [
+        {
+          "name": "List Offerings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offerings",
+              "host": ["{{baseUrl}}"],
+              "path": ["offerings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Offering",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": 1,\n  \"teacherId\": 1,\n  \"name\": \"Weekday Summer Camp\",\n  \"timezone\": \"Asia/Kolkata\",\n  \"maxCapacity\": 30,\n  \"sessions\": [\n    {\n      \"startTime\": \"2024-07-01T10:00:00\",\n      \"endTime\": \"2024-07-01T11:00:00\",\n      \"capacity\": 30\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offerings",
+              "host": ["{{baseUrl}}"],
+              "path": ["offerings"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Parents",
+      "item": [
+        {
+          "name": "List Parents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parents",
+              "host": ["{{baseUrl}}"],
+              "path": ["parents"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parentId\": 1,\n  \"sessionId\": 1\n}\n"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "{{bookingId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    }
+  ]
+}
